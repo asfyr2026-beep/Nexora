@@ -2,32 +2,36 @@ name: Build Nexora APK
 
 on:
   workflow_dispatch:
-  push:
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Download project
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Java
+      - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '17'
+          java-version: '21'
 
-      - name: Set up Gradle
+      - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
+
+      - name: Extract project
+        run: |
+          mkdir project
+          unzip -o nexora.zip -d project
 
       - name: Build APK
         run: |
-          unzip -o nexora.zip -d project
           cd project
           gradle assembleDebug
 
-      - name: Save APK
+      - name: Upload APK
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: Nexora-APK
